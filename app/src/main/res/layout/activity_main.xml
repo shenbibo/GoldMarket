@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sky.goldmarket.MainActivity">
+    tools:context="com.sky.goldmarket.ui.MainActivity">
 
     <TextView
         android:id="@+id/textView"
@@ -45,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"/>
 
     <EditText
-        android:id="@+id/request_interval"
+        android:id="@+id/interval_time"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
@@ -65,14 +65,14 @@
         android:layout_marginTop="60dp"/>
 
     <EditText
-        android:id="@+id/markup"
+        android:id="@+id/rise_threshold"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:inputType="numberDecimal"
         android:text="1.2"
-        app:layout_constraintStart_toStartOf="@+id/request_interval"
-        app:layout_constraintTop_toBottomOf="@+id/request_interval"/>
+        app:layout_constraintStart_toStartOf="@+id/interval_time"
+        app:layout_constraintTop_toBottomOf="@+id/interval_time"/>
 
     <Button
         android:id="@+id/start"
