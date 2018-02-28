@@ -5,7 +5,7 @@ package com.sky.goldmarket.data
  * 详述类的功能。
  * Created by sky on 2018/2/28.
  */
-data class ResponseBean(val name: String,
+data class Au9999Bean(val name: String,
                         val curPrice: Double,
                         val priceLimit: String, /** 涨跌幅*/
                         val startPrice:Double,

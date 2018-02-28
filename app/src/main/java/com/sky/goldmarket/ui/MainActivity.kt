@@ -24,17 +24,22 @@ class MainActivity : AppCompatActivity() {
             startService()
             start.isClickable = false
             stop.isClickable = true
+            start.alpha = 0.3f
+            stop.alpha = 1.0f
         }
 
         stop.setOnClickListener {
             stopService(Intent(this.applicationContext, RequestService::class.java))
             start.isClickable = true
             stop.isClickable = false
+            stop.alpha = 0.3f
+            start.alpha = 1.0f
         }
     }
 
     private fun startService() {
         val intent = Intent(this.applicationContext, RequestService::class.java)
+        intent.putExtra(Constant.KEY_WATCH_PRICE, watch_price.text.toString().toDouble())
         intent.putExtra(Constant.KEY_BUY_PRICE, buy_price.text.toString().toDouble())
         intent.putExtra(Constant.KEY_INTERVAL_TIME, interval_time.text.toString().toLong())
         intent.putExtra(Constant.KEY_RISE_THRESHOLD, rise_threshold.text.toString().toDouble())
