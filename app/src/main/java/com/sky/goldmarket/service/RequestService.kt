@@ -41,13 +41,14 @@ class RequestService : Service() {
     private val foregroundChannelId = "2018"
     private val goldChannelId = "2019"
     private val foregroundChannel = NotificationChannel(foregroundChannelId,
-            "前台", NotificationManager.IMPORTANCE_HIGH)
+                                                        "前台", NotificationManager.IMPORTANCE_HIGH)
     private val goldChannel = NotificationChannel(goldChannelId,
-            "前台", NotificationManager.IMPORTANCE_HIGH)
+                                                  "前台", NotificationManager.IMPORTANCE_HIGH)
 
     private var isDestroyed = false
     private var configParam = ConfigParam(0.0, 0.0, 60, 0.5)
     private val handler = Handler(Looper.getMainLooper())
+    private var isNewRefresh = true
 
     override fun onCreate() {
         super.onCreate()
@@ -69,6 +70,7 @@ class RequestService : Service() {
         EventBus.getDefault().register(this)
 
         setServiceForeground()
+        isNewRefresh = true
         startRequest()
         return super.onStartCommand(intent, flags, startId)
     }
@@ -114,13 +116,13 @@ class RequestService : Service() {
         val tBody = table2.child(0)
         val au9999 = tBody.child(2)
         val auBean = Au9999Bean(au9999.child(0).text(),
-                au9999.child(1).text().toDouble(),
-                au9999.child(3).text(),
-                au9999.child(5).text().toDouble(),
-                au9999.child(6).text().toDouble(),
-                au9999.child(7).text().toDouble(),
-                au9999.child(8).text().toDouble(),
-                au9999.child(9).text())
+                                au9999.child(1).text().toDouble(),
+                                au9999.child(3).text(),
+                                au9999.child(5).text().toDouble(),
+                                au9999.child(6).text().toDouble(),
+                                au9999.child(7).text().toDouble(),
+                                au9999.child(8).text().toDouble(),
+                                au9999.child(9).text())
 
         Slog.i(auBean.toString())
         return auBean
@@ -130,9 +132,12 @@ class RequestService : Service() {
      * 当前价格差的幅度大于等于设置的涨幅值则返回true，或者当前的成交价格低于设定的阈值
      * */
     private fun shouldNotifyToUser(curPrice: Double): Boolean {
-//        return (configParam.buyPrice == 0.0 && (curPrice <= configParam.watchPrice))
-//                || (getRisePercent(curPrice) >= configParam.riseThreshold)
-        return true
+        val shouldNotify = isNewRefresh
+                || (configParam.buyPrice == 0.0 && (curPrice <= configParam.watchPrice))
+                || (getRisePercent(curPrice) >= configParam.riseThreshold)
+        isNewRefresh = false
+
+        return shouldNotify
     }
 
     private fun getRisePercent(curPrice: Double) = (curPrice - configParam.buyPrice) / configParam.buyPrice
@@ -141,7 +146,7 @@ class RequestService : Service() {
         val content = createNotificationContent(au9999Bean)
         val notification = Notification.Builder(applicationContext, foregroundChannelId)
                 .setContentText(content)
-                .setLargeIcon(Icon.createWithResource(applicationContext, R.drawable.large_icon_round))
+                //.setLargeIcon(Icon.createWithResource(applicationContext, R.drawable.large_icon_round))
                 .setSmallIcon(R.drawable.small_icon_round)
                 .build()
 
@@ -179,13 +184,13 @@ class RequestService : Service() {
         watchPrice.setSpan(watchPriceColorSpan, 0, watchPrice.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         risePercentStr.setSpan(risePercentColorSpan, 0, risePercentStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        ssb.append("cur: ")
+        ssb.append("c:")
                 .append(curPrice)
-                .append("  buy: ")
+                .append(" b:")
                 .append(buyPrice)
-                .append("  watch: ")
+                .append(" w:")
                 .append(watchPrice)
-                .append("  rise: ")
+                .append(" r:")
                 .append(risePercentStr)
 
         return ssb
@@ -195,6 +200,7 @@ class RequestService : Service() {
     fun onEvent(configParamEvent: ConfigParamEvent) {
         configParam = configParamEvent.configParam
         handler.removeCallbacksAndMessages(null)
+        isNewRefresh = true
         requestDelay(0)
     }
 
