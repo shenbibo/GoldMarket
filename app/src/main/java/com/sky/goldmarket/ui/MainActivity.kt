@@ -4,11 +4,14 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.sky.goldmarket.R
+import com.sky.goldmarket.data.ConfigParam
+import com.sky.goldmarket.data.ConfigParamEvent
 import com.sky.goldmarket.data.Constant
 import com.sky.goldmarket.service.RequestService
 import com.sky.slog.LogcatTree
 import com.sky.slog.Slog
 import kotlinx.android.synthetic.main.activity_main.*
+import org.greenrobot.eventbus.EventBus
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +37,15 @@ class MainActivity : AppCompatActivity() {
             stop.isClickable = false
             stop.alpha = 0.3f
             start.alpha = 1.0f
+        }
+
+        refresh.setOnClickListener {
+            val configData = ConfigParam(watch_price.text.toString().toDouble(),
+                    buy_price.text.toString().toDouble(),
+                    interval_time.text.toString().toLong(),
+                    rise_threshold.text.toString().toDouble())
+
+            EventBus.getDefault().post(ConfigParamEvent(configData))
         }
     }
 
