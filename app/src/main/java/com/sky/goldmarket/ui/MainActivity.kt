@@ -3,6 +3,7 @@ package com.sky.goldmarket.ui
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import com.sky.goldmarket.R
 import com.sky.goldmarket.data.ConfigParam
 import com.sky.goldmarket.data.ConfigParamEvent
@@ -12,6 +13,8 @@ import com.sky.slog.LogcatTree
 import com.sky.slog.Slog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
+        EventBus.getDefault().register(this)
+
         start.setOnClickListener {
             startService()
             start.isClickable = false
@@ -56,6 +61,16 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(Constant.KEY_INTERVAL_TIME, interval_time.text.toString().toLong())
         intent.putExtra(Constant.KEY_RISE_THRESHOLD, rise_threshold.text.toString().toDouble())
         startService(intent)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEvent(msg: SpannableStringBuilder){
+        cur_data.text = msg
+    }
+
+    override fun onDestroy() {
+        EventBus.getDefault().unregister(this)
+        super.onDestroy()
     }
 
 }
